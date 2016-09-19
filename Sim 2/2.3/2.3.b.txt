@@ -1,0 +1,2 @@
+Tensão 46.28V
+Corrente 0.9256A

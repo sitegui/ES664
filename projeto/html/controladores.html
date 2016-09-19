@@ -1,0 +1,381 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>controladores</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-11-24"><meta name="DC.source" content="controladores.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Projeto ES664</a></li><li><a href="#2">Par&acirc;metros do motor</a></li><li><a href="#3">Constante do motor</a></li><li><a href="#4">Fun&ccedil;&otilde;es de transfer&ecirc;ncia do motor</a></li><li><a href="#5">Projeto controlador da malha de corrente</a></li><li><a href="#6">Projeto controlador da malha de velocidade</a></li><li><a href="#7">Modelo cinem&aacute;tico direto do manipulador</a></li><li><a href="#8">Modelo cinem&aacute;tico inverso do manipulador</a></li><li><a href="#9">Modelo din&acirc;mico do manipulador</a></li><li><a href="#10">Curvas de resposta do rob&ocirc;</a></li><li><a href="#11">Valida&ccedil;&atilde;o do projeto</a></li></ul></div><h2>Projeto ES664<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>
+</pre><h2>Par&acirc;metros do motor<a name="2"></a></h2><pre class="codeinput">Ra = 2.58;
+La = 28e-3;
+J = 2.22e-2;
+B = 2.95e-3;
+Vs = 240;
+Ftri = 1e3; <span class="comment">% frequ&ecirc;ncia da portadora triangular</span>
+</pre><h2>Constante do motor<a name="3"></a></h2><p>Das equa&ccedil;&otilde;es do motor em regime permanente:</p><p><img src="controladores_eq27040.png" alt="$$T_{em} = k_T * I_a$$"></p><p><img src="controladores_eq17018.png" alt="$$E_a = k_E * \omega_m$$"></p><p><img src="controladores_eq23154.png" alt="$$V_t = E_a + R_a * I_a$$"></p><p><img src="controladores_eq95508.png" alt="$$T_{em} = T_{WL} + B * \omega_m$$"></p><p>Com <img src="controladores_eq88352.png" alt="$k_T = k_E$">, <img src="controladores_eq25297.png" alt="$\omega_m = 1750rad/s$">, <img src="controladores_eq41526.png" alt="$V_t = 240V$">, <img src="controladores_eq04566.png" alt="$R_a = 2.58\Omega$">, <img src="controladores_eq52477.png" alt="$B = 2.95 \cdot 10^-3Nms$">, obt&eacute;m-se <img src="controladores_eq89127.png" alt="$k = k_T = k_E$">:</p><pre class="codeinput">wmn = 1750 * 2 * pi / 60; <span class="comment">% velocidade nominal (rad/s)</span>
+Temn = B * wmn; <span class="comment">% torque eletromec&acirc;nico para manter a velocidade nominal</span>
+k = roots([wmn -Vs Ra*Temn])
+k = k(1);
+Pn = 5 * 745.7; <span class="comment">% pot&ecirc;ncia nominal (W)</span>
+Tmax = Pn/wmn;
+</pre><pre class="codeoutput">
+k =
+
+    1.3038
+    0.0058
+
+</pre><h2>Fun&ccedil;&otilde;es de transfer&ecirc;ncia do motor<a name="4"></a></h2><pre class="codeinput">s = tf(<span class="string">'s'</span>);
+Vt_wm = minreal(feedback(1/(Ra+s*La) * k * 1/(B+s*J), k));
+Ia_wm = minreal(k * 1/(B+s*J));
+Vt_Ia = minreal(Vt_wm/Ia_wm);
+D_Vt = Vs;
+</pre><h2>Projeto controlador da malha de corrente<a name="5"></a></h2><pre class="codeinput">GIa = D_Vt * Vt_Ia;
+zpk(GIa)
+CIa = pid(30, 100)
+Iar_Ia = minreal(feedback(CIa * GIa, 1));
+</pre><pre class="codeoutput">
+ans =
+ 
+    8571.4 (s+0.1329)
+  ---------------------
+  (s^2 + 92.28s + 2747)
+ 
+Continuous-time zero/pole/gain model.
+
+
+CIa =
+ 
+             1 
+  Kp + Ki * ---
+             s 
+
+  with Kp = 30, Ki = 100
+ 
+Continuous-time PI controller in parallel form.
+
+</pre><h2>Projeto controlador da malha de velocidade<a name="6"></a></h2><pre class="codeinput">Temr_Iar = 1/k;
+Gwm = minreal(Temr_Iar * Iar_Ia * Ia_wm);
+zpk(Gwm)
+Cwm = pid(1, 0.1)
+wmr_wm = minreal(feedback(Cwm * Gwm, 1));
+</pre><pre class="codeoutput">
+ans =
+ 
+         1.1583e07 (s+3.333)
+  ---------------------------------
+  (s+2.572e05) (s+3.343) (s+0.1324)
+ 
+Continuous-time zero/pole/gain model.
+
+
+Cwm =
+ 
+             1 
+  Kp + Ki * ---
+             s 
+
+  with Kp = 1, Ki = 0.1
+ 
+Continuous-time PI controller in parallel form.
+
+</pre><h2>Modelo cinem&aacute;tico direto do manipulador<a name="7"></a></h2><pre class="codeinput">m = 4;
+d = 0.6;
+thetamin = 0;
+thetamax = 90;
+f = @(theta)[d*cos(theta/180*pi); d*sin(theta/180*pi)];
+thetas = linspace(thetamin, thetamax);
+xys = f(thetas);
+plot(thetas, xys);
+legend(<span class="string">'x (m)'</span>, <span class="string">'y (m)'</span>);
+xlabel(<span class="string">'\theta (&ordm;)'</span>);
+snapnow;
+plot(xys(1, :), xys(2, :));
+xlabel(<span class="string">'x (m)'</span>);
+ylabel(<span class="string">'y (m)'</span>);
+snapnow;
+</pre><img vspace="5" hspace="5" src="controladores_01.png" alt=""> <img vspace="5" hspace="5" src="controladores_02.png" alt=""> <h2>Modelo cinem&aacute;tico inverso do manipulador<a name="8"></a></h2><pre class="codeinput">f1 = @(x, y)180*atan(y./x)/pi;
+</pre><h2>Modelo din&acirc;mico do manipulador<a name="9"></a></h2><pre class="codeinput">g = 9.81;
+I = m*d*d/3;
+tau = @(theta,thetapp)d/2*cos(theta/180*pi)*m*g + I*thetapp/180*pi;
+</pre><h2>Curvas de resposta do rob&ocirc;<a name="10"></a></h2><pre class="codeinput">[theta, thetap, thetapp, t] = trapezio(thetamin, thetamax, 10);
+subplot(2, 1, 1);
+plot(t, theta, <span class="string">'k'</span>);
+ylabel(<span class="string">'\theta (&ordm;)'</span>);
+xlabel(<span class="string">'Tempo (s)'</span>);
+subplot(2, 1, 2);
+plot(t, thetap, <span class="string">'k'</span>, t, tau(theta, thetapp), <span class="string">'k--'</span>);
+legend(<span class="string">'\theta ponto (&ordm;/s)'</span>, <span class="string">'\tau (Nm)'</span>);
+xlabel(<span class="string">'Tempo (s)'</span>);
+snapnow;
+
+[theta, thetap, thetapp, t] = trapezio(thetamin, thetamax, 5);
+subplot(2, 1, 1);
+plot(t, theta, <span class="string">'k'</span>);
+ylabel(<span class="string">'\theta (&ordm;)'</span>);
+xlabel(<span class="string">'Tempo (s)'</span>);
+subplot(2, 1, 2);
+plot(t, thetap, <span class="string">'k'</span>, t, tau(theta, thetapp), <span class="string">'k--'</span>);
+legend(<span class="string">'\theta ponto (&ordm;/s)'</span>, <span class="string">'\tau (Nm)'</span>);
+xlabel(<span class="string">'Tempo (s)'</span>);
+snapnow;
+
+[theta, thetap, thetapp, t] = trapezio(thetamin, thetamax, 1);
+subplot(2, 1, 1);
+plot(t, theta, <span class="string">'k'</span>);
+ylabel(<span class="string">'\theta (&ordm;)'</span>);
+xlabel(<span class="string">'Tempo (s)'</span>);
+subplot(2, 1, 2);
+plot(t, thetap, <span class="string">'k'</span>, t, tau(theta, thetapp), <span class="string">'k--'</span>);
+legend(<span class="string">'\theta ponto (&ordm;/s)'</span>, <span class="string">'\tau (Nm)'</span>);
+xlabel(<span class="string">'Tempo (s)'</span>);
+snapnow;
+</pre><img vspace="5" hspace="5" src="controladores_03.png" alt=""> <img vspace="5" hspace="5" src="controladores_04.png" alt=""> <img vspace="5" hspace="5" src="controladores_05.png" alt=""> <h2>Valida&ccedil;&atilde;o do projeto<a name="11"></a></h2><p>Deslocamento de 0 a 90&ordm; em 10s</p><pre class="codeinput">[~, thetap, ~, t] = trapezio(0, 90/180*pi, 10);
+simin = [t' thetap'];
+out = sim(<span class="string">'projeto'</span>, <span class="string">'StopTime'</span>, <span class="string">'10'</span>);
+plotScope(out.get(<span class="string">'simout1'</span>), {<span class="string">'x (m)'</span>, <span class="string">'y (m)'</span>, {<span class="string">'\theta^{*} (rad)'</span>, <span class="string">'\theta (rad)'</span>}});
+snapnow;
+plotScope(out.get(<span class="string">'simout2'</span>), {{<span class="string">'\omega^{*}_m (rad/s)'</span>, <span class="string">'\omega_m (rad/s)'</span>}, <span class="string">'\tau (Nm)'</span>, <span class="string">'T_{em} (Nm)'</span>});
+snapnow;
+plotScope(out.get(<span class="string">'simout3'</span>), {<span class="string">'V_a (V)'</span>, <span class="string">'I_a (A)'</span>, <span class="string">'Duty Cycle'</span>});
+snapnow;
+</pre><img vspace="5" hspace="5" src="controladores_06.png" alt=""> <img vspace="5" hspace="5" src="controladores_07.png" alt=""> <img vspace="5" hspace="5" src="controladores_08.png" alt=""> <p>Deslocamento de 0 a 70&ordm; em 5s, seguido de retorno a 30&ordm; em 5s</p><pre class="codeinput">[~, thetap, ~, t] = trapezio(0, 70/180*pi, 5);
+[~, thetap2, ~, t2] = trapezio(70/180*pi, 30/180*pi, 5);
+simin = [[t 5+t2]' [thetap thetap2]'];
+out = sim(<span class="string">'projeto'</span>, <span class="string">'StopTime'</span>, <span class="string">'10'</span>);
+plotScope(out.get(<span class="string">'simout1'</span>), {<span class="string">'x (m)'</span>, <span class="string">'y (m)'</span>, {<span class="string">'\theta^{*} (rad)'</span>, <span class="string">'\theta (rad)'</span>}});
+snapnow;
+plotScope(out.get(<span class="string">'simout2'</span>), {{<span class="string">'\omega^{*}_m (rad/s)'</span>, <span class="string">'\omega_m (rad/s)'</span>}, <span class="string">'\tau (Nm)'</span>, <span class="string">'T_{em} (Nm)'</span>});
+snapnow;
+plotScope(out.get(<span class="string">'simout3'</span>), {<span class="string">'V_a (V)'</span>, <span class="string">'I_a (A)'</span>, <span class="string">'Duty Cycle'</span>});
+snapnow;
+</pre><img vspace="5" hspace="5" src="controladores_09.png" alt=""> <img vspace="5" hspace="5" src="controladores_10.png" alt=""> <img vspace="5" hspace="5" src="controladores_11.png" alt=""> <p>Deslocamento  de  0  a  90&deg;  com  incrementos  de  10&deg;,  mantendo  a ferramenta estacion&aacute;ria em cada posi&ccedil;&atilde;o por 2s</p><pre class="codeinput">[~, thetap, ~, t] = trapezio(0, 10/180*pi, 1);
+t2 = linspace(1, 3);
+thetap2 = zeros(1, numel(t2));
+t3 = [t t2];
+thetap3 = [thetap thetap2];
+simin = [[t3 3+t3 6+t3 9+t3 12+t3 15+t3 18+t3 21+t3 24+t3]' [thetap3 thetap3 thetap3 thetap3 thetap3 thetap3 thetap3 thetap3 thetap3]'];
+out = sim(<span class="string">'projeto'</span>, <span class="string">'StopTime'</span>, <span class="string">'27'</span>);
+plotScope(out.get(<span class="string">'simout1'</span>), {<span class="string">'x (m)'</span>, <span class="string">'y (m)'</span>, {<span class="string">'\theta^{*} (rad)'</span>, <span class="string">'\theta (rad)'</span>}});
+snapnow;
+plotScope(out.get(<span class="string">'simout2'</span>), {{<span class="string">'\omega^{*}_m (rad/s)'</span>, <span class="string">'\omega_m (rad/s)'</span>}, <span class="string">'\tau (Nm)'</span>, <span class="string">'T_{em} (Nm)'</span>});
+snapnow;
+plotScope(out.get(<span class="string">'simout3'</span>), {<span class="string">'V_a (V)'</span>, <span class="string">'I_a (A)'</span>, <span class="string">'Duty Cycle'</span>});
+snapnow;
+</pre><img vspace="5" hspace="5" src="controladores_12.png" alt=""> <img vspace="5" hspace="5" src="controladores_13.png" alt=""> <img vspace="5" hspace="5" src="controladores_14.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Projeto ES664
+clear all
+
+%% Parâmetros do motor
+Ra = 2.58;
+La = 28e-3;
+J = 2.22e-2;
+B = 2.95e-3;
+Vs = 240;
+Ftri = 1e3; % frequência da portadora triangular
+
+%% Constante do motor
+% Das equações do motor em regime permanente:
+%
+% $$T_{em} = k_T * I_a$$
+%
+% $$E_a = k_E * \omega_m$$
+%
+% $$V_t = E_a + R_a * I_a$$
+%
+% $$T_{em} = T_{WL} + B * \omega_m$$
+%
+% Com $k_T = k_E$, $\omega_m = 1750rad/s$, $V_t = 240V$, $R_a = 2.58\Omega$,
+% $B = 2.95 \cdot 10^-3Nms$, obtém-se $k = k_T = k_E$:
+wmn = 1750 * 2 * pi / 60; % velocidade nominal (rad/s)
+Temn = B * wmn; % torque eletromecânico para manter a velocidade nominal
+k = roots([wmn -Vs Ra*Temn])
+k = k(1);
+Pn = 5 * 745.7; % potência nominal (W)
+Tmax = Pn/wmn;
+
+%% Funções de transferência do motor
+s = tf('s');
+Vt_wm = minreal(feedback(1/(Ra+s*La) * k * 1/(B+s*J), k));
+Ia_wm = minreal(k * 1/(B+s*J));
+Vt_Ia = minreal(Vt_wm/Ia_wm);
+D_Vt = Vs;
+
+%% Projeto controlador da malha de corrente
+GIa = D_Vt * Vt_Ia;
+zpk(GIa)
+CIa = pid(30, 100)
+Iar_Ia = minreal(feedback(CIa * GIa, 1));
+
+%% Projeto controlador da malha de velocidade
+Temr_Iar = 1/k;
+Gwm = minreal(Temr_Iar * Iar_Ia * Ia_wm);
+zpk(Gwm)
+Cwm = pid(1, 0.1)
+wmr_wm = minreal(feedback(Cwm * Gwm, 1));
+
+%% Modelo cinemático direto do manipulador
+m = 4;
+d = 0.6;
+thetamin = 0;
+thetamax = 90;
+f = @(theta)[d*cos(theta/180*pi); d*sin(theta/180*pi)];
+thetas = linspace(thetamin, thetamax);
+xys = f(thetas);
+plot(thetas, xys);
+legend('x (m)', 'y (m)');
+xlabel('\theta (º)');
+snapnow;
+plot(xys(1, :), xys(2, :));
+xlabel('x (m)');
+ylabel('y (m)');
+snapnow;
+
+%% Modelo cinemático inverso do manipulador
+f1 = @(x, y)180*atan(y./x)/pi;
+
+%% Modelo dinâmico do manipulador
+g = 9.81;
+I = m*d*d/3;
+tau = @(theta,thetapp)d/2*cos(theta/180*pi)*m*g + I*thetapp/180*pi;
+
+%% Curvas de resposta do robô
+[theta, thetap, thetapp, t] = trapezio(thetamin, thetamax, 10);
+subplot(2, 1, 1);
+plot(t, theta, 'k');
+ylabel('\theta (º)');
+xlabel('Tempo (s)');
+subplot(2, 1, 2);
+plot(t, thetap, 'k', t, tau(theta, thetapp), 'kREPLACE_WITH_DASH_DASH');
+legend('\theta ponto (º/s)', '\tau (Nm)');
+xlabel('Tempo (s)');
+snapnow;
+
+[theta, thetap, thetapp, t] = trapezio(thetamin, thetamax, 5);
+subplot(2, 1, 1);
+plot(t, theta, 'k');
+ylabel('\theta (º)');
+xlabel('Tempo (s)');
+subplot(2, 1, 2);
+plot(t, thetap, 'k', t, tau(theta, thetapp), 'kREPLACE_WITH_DASH_DASH');
+legend('\theta ponto (º/s)', '\tau (Nm)');
+xlabel('Tempo (s)');
+snapnow;
+
+[theta, thetap, thetapp, t] = trapezio(thetamin, thetamax, 1);
+subplot(2, 1, 1);
+plot(t, theta, 'k');
+ylabel('\theta (º)');
+xlabel('Tempo (s)');
+subplot(2, 1, 2);
+plot(t, thetap, 'k', t, tau(theta, thetapp), 'kREPLACE_WITH_DASH_DASH');
+legend('\theta ponto (º/s)', '\tau (Nm)');
+xlabel('Tempo (s)');
+snapnow;
+
+%% Validação do projeto
+
+%%
+% Deslocamento de 0 a 90º em 10s
+[~, thetap, ~, t] = trapezio(0, 90/180*pi, 10);
+simin = [t' thetap'];
+out = sim('projeto', 'StopTime', '10');
+plotScope(out.get('simout1'), {'x (m)', 'y (m)', {'\theta^{*} (rad)', '\theta (rad)'}});
+snapnow;
+plotScope(out.get('simout2'), {{'\omega^{*}_m (rad/s)', '\omega_m (rad/s)'}, '\tau (Nm)', 'T_{em} (Nm)'});
+snapnow;
+plotScope(out.get('simout3'), {'V_a (V)', 'I_a (A)', 'Duty Cycle'});
+snapnow;
+
+%%
+% Deslocamento de 0 a 70º em 5s, seguido de retorno a 30º em 5s
+[~, thetap, ~, t] = trapezio(0, 70/180*pi, 5);
+[~, thetap2, ~, t2] = trapezio(70/180*pi, 30/180*pi, 5);
+simin = [[t 5+t2]' [thetap thetap2]'];
+out = sim('projeto', 'StopTime', '10');
+plotScope(out.get('simout1'), {'x (m)', 'y (m)', {'\theta^{*} (rad)', '\theta (rad)'}});
+snapnow;
+plotScope(out.get('simout2'), {{'\omega^{*}_m (rad/s)', '\omega_m (rad/s)'}, '\tau (Nm)', 'T_{em} (Nm)'});
+snapnow;
+plotScope(out.get('simout3'), {'V_a (V)', 'I_a (A)', 'Duty Cycle'});
+snapnow;
+
+%%
+% Deslocamento  de  0  a  90°  com  incrementos  de  10°,  mantendo  a
+% ferramenta estacionária em cada posição por 2s
+[~, thetap, ~, t] = trapezio(0, 10/180*pi, 1);
+t2 = linspace(1, 3);
+thetap2 = zeros(1, numel(t2));
+t3 = [t t2];
+thetap3 = [thetap thetap2];
+simin = [[t3 3+t3 6+t3 9+t3 12+t3 15+t3 18+t3 21+t3 24+t3]' [thetap3 thetap3 thetap3 thetap3 thetap3 thetap3 thetap3 thetap3 thetap3]'];
+out = sim('projeto', 'StopTime', '27');
+plotScope(out.get('simout1'), {'x (m)', 'y (m)', {'\theta^{*} (rad)', '\theta (rad)'}});
+snapnow;
+plotScope(out.get('simout2'), {{'\omega^{*}_m (rad/s)', '\omega_m (rad/s)'}, '\tau (Nm)', 'T_{em} (Nm)'});
+snapnow;
+plotScope(out.get('simout3'), {'V_a (V)', 'I_a (A)', 'Duty Cycle'});
+snapnow;
+
+##### SOURCE END #####
+--></body></html>

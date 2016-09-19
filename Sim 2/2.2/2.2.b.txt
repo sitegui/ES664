@@ -1,0 +1,2 @@
+Tensão média: 40.43V
+Corrente média: 0.8086A

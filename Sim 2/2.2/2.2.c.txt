@@ -1,0 +1,2 @@
+Tensão 30.18V
+Corrente 0.6036A

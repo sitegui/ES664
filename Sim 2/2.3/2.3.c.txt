@@ -1,0 +1,2 @@
+Tensão 91.25V
+Corrente 1.825A
